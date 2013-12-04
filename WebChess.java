@@ -4,14 +4,19 @@ import java.io.*;
 public class WebChess{
 
     public static void main(String[] args){
-	try{
-	    HTTPServer s = new HTTPServer();
-	    while(true){
-		s.loadConnexion();
+	try {
+	    HTTPServer s;
+	    if (args.length == 0) {
+		s = new HTTPServer();
+	    } else {
+		s = new HTTPServer(args[0]);
 	    }
-	} catch (IOException ioe){
+	    while(true) {
+		s.loadConnection();
+	    }
+	} catch (IOException ioe) {
 	    System.out.println("Server Socket Error: " + ioe.getMessage());
-	} catch (Exception e){
+	} catch (Exception e) {
 	    System.out.println("Application Error: " + e.getMessage());
 	}
 	System.out.println("Server stopped");
