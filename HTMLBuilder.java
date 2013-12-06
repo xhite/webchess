@@ -9,29 +9,28 @@ public class HTMLBuilder {
     public HTMLBuilder(ChessBoard cb) {
 	this.cb = cb;
 	sb = new StringBuilder();
-	sb.append("<html>");
-	sb.append("<head>");
-	sb.append("<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\" />");
-	sb.append("<html>");
-	sb.append("<link rel=\"stylesheet\" href=\"stylesheet.css\" type=\"text/css\" />");
-	sb.append("<title>");
-	sb.append("Échecs en ligne");
-	sb.append("</title>");
-	sb.append("</head>");
-	sb.append("<body>");
-	sb.append("<form>");
-	sb.append("<table align=center>");
+	sb.append("<html>\n");
+	sb.append("<head>\n");
+	sb.append("<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\" />\n");
+	sb.append("<link rel=\"stylesheet\" href=\"stylesheet.css\" type=\"text/css\" />\n");
+	sb.append("<title>\n");
+	sb.append("\tÉchecs en ligne\n");
+	sb.append("</title>\n");
+	sb.append("</head>\n");
+	sb.append("<body>\n");
+	sb.append("<form>\n");
+	sb.append("<table align=center>\n");
 	buildBorder();
     }
 
     public void buildBorder() {
-	sb.append("<tr>");
-	sb.append("<td class=\"corner\"></td>");
+	sb.append("\t<tr>\n");
+	sb.append("\t\t<td class=\"corner\"></td>\n");
 	int x;
 	for (x = 0; x < 8; x++) 
-	    sb.append("<td class=\"border\">" + (char)(x+65) + "</td>");
-	sb.append("<td class=\"corner\"></td>");
-	sb.append("<tr>");
+	    sb.append("\t\t<td class=\"border\">" + (char)(x+65) + "</td>\n");
+	sb.append("\t\t<td class=\"corner\"></td>\n");
+	sb.append("\t</tr>\n");
     } 
 
     public String buildImageName(Piece p){
@@ -51,34 +50,41 @@ public class HTMLBuilder {
 	return (char)(x+65) + String.valueOf(y);
     }
 
-    private String buildImageRep(Piece p) {
-	if (p != null) {
-	    switch(p.getName()) {
-	    case "pawn":
-		return "P";
-	    case "rook":
-		return "T";
-	    case "knight":
-		return "C";
-	    case "bishop":
-		return "F";
-	    case "queen":
-		return "D";
-	    case "king":
-		return "R";
-	    default:
-		return " ";
-	    }
+    private String searchImageRep(String name) {
+	switch(name) {
+	case "pawn":
+	    return "P";
+	case "rook":
+	    return "T";
+	case "knight":
+	    return "C";
+	case "bishop":
+	    return "F";
+	case "queen":
+	    return "D";
+	case "king":
+	    return "R";
+	default:
+	    return " ";
 	}
-	return " ";
+    }
+
+    private String buildImageRep(Piece p) {
+	String imageRep;
+	    if (p != null) {
+		imageRep = searchImageRep(p.getName());
+	    } else {
+		return "";
+	    }
+	return p.getColor() == "white" ? imageRep : imageRep.toLowerCase();
     }
 
     public void buildHTMLLine(int x, int y) {
 	Boolean whiteSquare = cb.getSquare(x,y);
 	Piece piece = cb.getPiece(x,y);
-	sb.append("<td class=\"" + buildParity(whiteSquare) + "\" ><input type=\"image\" name=\"" + buildPlacement(x,y) + "\" src=\"pieces/"+ buildImageName(piece) + ".svg\" alt=\""
+	sb.append("\t\t<td class=\"" + buildParity(whiteSquare) + "\" ><input type=\"image\" name=\"" + buildPlacement(x,y) + "\" src=\"pieces/"+ buildImageName(piece) + ".svg\" alt=\""
 		  + buildImageRep(piece)
-		  + "\" width=32 /></td>");
+		  + "\" width=32 /></td>\n");
     }
 
     
@@ -86,17 +92,17 @@ public class HTMLBuilder {
     public void buildHTML() {
 	int x,y;
 	for (y = 7; y >= 0; y--) {
-	    sb.append("<tr><td class=\"border\">" + (y+1) + "</td>");
+	    sb.append("\t<tr>\n\t\t<td class=\"border\">" + (y+1) + "</td>\n");
 	    for (x = 0; x < 8; x++) {
 	       buildHTMLLine(x,y);
 	    }
-	    sb.append("</td><td class=\"border\">" + (y+1) + "<tr>");
+	    sb.append("\t\t<td class=\"border\">" + (y+1) + "</td>\n\t</tr>\n");
 	}
 	buildBorder();
-	sb.append("</table>");
-	sb.append("</form>");
-	sb.append("</body>");
-	sb.append("</html>");
+	sb.append("</table>\n");
+	sb.append("</form>\n");
+	sb.append("</body>\n");
+	sb.append("</html>\n");
     }
 
     public void build(String filename) throws IOException {
