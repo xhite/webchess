@@ -5,6 +5,8 @@ public class WebChess{
 
     public static void main(String[] args){
 	try {
+	    HTMLBuilder htmlBuilder = new HTMLBuilder(new ChessBoard());
+	    htmlBuilder.build("test.html");
 	    HTTPServer s;
 	    if (args.length == 0) {
 		s = new HTTPServer();
