@@ -3,10 +3,12 @@ public class ChessBoard {
     
     private Piece[][] pieces;
     private Boolean[][] squares;
+    private Boolean turn; //true if white
 
     public ChessBoard() {
 	squares = new Boolean[8][8];
 	pieces = new Piece[8][8];
+	turn = true;
 	initializeBoard();
 	initializePieces();
     }
@@ -64,5 +66,11 @@ public class ChessBoard {
     public Boolean getSquare(int x, int y) {
 	return squares[x][y];
     }
-
+    
+    public String getTurn() {
+	if (turn)
+	    return "white";
+	return "black";
+    }
+ 
 }

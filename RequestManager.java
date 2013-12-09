@@ -5,25 +5,45 @@ public class RequestManager {
 
     private String request;
 
-    public RequestManager(String request){
+    public RequestManager(String request) {
 	this.request = request;
     }
-    
-    public String requestURL(){
-	String[] getRequest, url;
+
+    private String requestURL() {
 	if(request.contains("GET")){
+	    String[] getRequest;
 	    getRequest = request.split(" ");
-	    if(getRequest[1].contains("?")){
-		url = getRequest[1].split("\\?");
-		return "." + url[0];
-	    } else {
-		return "." + getRequest[1];
-	    }
+	    return getRequest[1];
+	} else {
+	    return null;
+	}
+    }
+	
+    private String requestParams() {
+	String url = requestURL();
+	String[] params;
+	if(url != null && url.contains("?")) {
+	    params = url.split("\\?");
+	    return params[1];
 	} else {
 	    return null;
 	}
     }
 
+    public String requestFile(){
+	String url = requestURL();
+	String[] file;
+	if(url != null)
+	    if(url.contains("?")){
+		file = url.split("\\?");
+		return "." + file[0];
+	    } else {
+		return "." + url;
+	    }
+	} else {
+	    return null;
+	}
+    }
     
     public String requestType() {
 	if (request.contains("image/png")) {
@@ -32,6 +52,17 @@ public class RequestManager {
 	    return "text/html";
 	} else if (request.contains("text/css")) {
 	    return "text/css";
+	} else {
+	    return null;
+	}
+    }
+
+    public String requestPosition() {
+	String[] position;
+	String params = requestParams();
+	if(params != null) {
+	    position = params.split(".");
+	    return position[0];
 	} else {
 	    return null;
 	}
