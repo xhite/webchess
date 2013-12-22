@@ -33,68 +33,68 @@ public class HTMLBuilder {
 	sb.append("\t</tr>\n");
     } 
 
+    private String buildPlacement(Position pos) {
+	return (char)(pos.getX()+65) + String.valueOf(pos.getY()+1);
+    }
+
+    private String buildImageType(Piece p, String square) {
+	if (cb.getTurn() == p.getColor()) {
+	    String placement;
+	    if (square.contains("Select"))
+		placement = "to" + buildPlacement(p.getPosition());
+	    else
+		placement = buildPlacement(p.getPosition());
+	    return "input type=\"image\" name=\""
+		+ placement
+		+ "\"";
+	} else {
+	    return "img";
+	}
+    }
+
     public String buildImageName(Piece p){
-	if (p != null) {
-	    String name = p.getName();
-	    return p.getColor() + Character.toUpperCase(name.charAt(0)) + name.substring(1);
-	}
-	return "blank";
+	return p.getColor() + p.getName();
     }
 
-    private String buildParity(Boolean b) {
-	return b? "even" : "odd";
+    private void buildEmptySquare(String square, Position pos) {
+	sb.append("\t\t<td class=\"" + square + "\">");
+	if (square.contains("Select")) {
+	    sb.append("<input type=\"image\" name=\""
+		      + "to" + buildPlacement(pos)
+		      + "\" src=\"pieces/blank.svg\" alt=\" \" width=32 /></td>\n");
+	} else
+	    sb.append("<img src=\"pieces/blank.svg\" alt=\" \" width=32 /></td>\n");
     }
 
-    private String buildPlacement(int x, int y) {
-	y++;
-	return (char)(x+65) + String.valueOf(y);
-    }
-
-    private String searchImageRep(String name) {
-	switch(name) {
-	case "pawn":
-	    return "P";
-	case "rook":
-	    return "T";
-	case "knight":
-	    return "C";
-	case "bishop":
-	    return "F";
-	case "queen":
-	    return "D";
-	case "king":
-	    return "R";
-	default:
-	    return " ";
-	}
-    }
-
-    private String buildImageRep(Piece p) {
-	String imageRep;
-	    if (p != null) {
-		imageRep = searchImageRep(p.getName());
-	    } else {
-		return "";
-	    }
-	return p.getColor() == "white" ? imageRep : imageRep.toLowerCase();
-    }
-
-    public void buildHTMLLine(int x, int y) {
-	Boolean whiteSquare = cb.getSquare(x,y);
-	Piece piece = cb.getPiece(x,y);
-	sb.append("\t\t<td class=\"" + buildParity(whiteSquare) + "\" ><input type=\"image\" name=\"" + buildPlacement(x,y) + "\" src=\"pieces/"+ buildImageName(piece) + ".svg\" alt=\""
-		  + buildImageRep(piece)
+    private void buildPiece(Piece p, String square) {
+	sb.append("\t\t<td class=\""
+		  + square
+		  + "\"><"
+		  + buildImageType(p, square)
+		  + " src=\"pieces/"
+		  + buildImageName(p)
+		  + ".svg\" alt=\""
+		  + p.getRep()
 		  + "\" width=32 /></td>\n");
     }
-
     
+    public void buildHTMLLine(int x, int y) {
+	Piece p = cb.getPiece(x, y);
+	String square = cb.getSquare(x, y);
+	if (p == null) {
+	    buildEmptySquare(square, new Position(x,y));
+	}
+	else {
+	    buildPiece(p, square);
+	}
+    }
 
     public void buildHTML() {
-	int x,y;
+	int x, y;
 	for (y = 7; y >= 0; y--) {
 	    sb.append("\t<tr>\n\t\t<td class=\"border\">" + (y+1) + "</td>\n");
 	    for (x = 0; x < 8; x++) {
-	       buildHTMLLine(x,y);
+		buildHTMLLine(x, y);
 	    }
 	    sb.append("\t\t<td class=\"border\">" + (y+1) + "</td>\n\t</tr>\n");
 	}
@@ -106,11 +106,10 @@ public class HTMLBuilder {
     }
 
     public void build(String filename) throws IOException {
-	buildHTML();
+       	buildHTML();
 	PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
 	out.print(sb.toString());
 	out.close();
     }
-
 
 }

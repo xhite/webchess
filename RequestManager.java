@@ -9,7 +9,7 @@ public class RequestManager {
 	this.request = request;
     }
 
-    private String requestURL() {
+    private String requestedURL() {
 	if(request.contains("GET")){
 	    String[] getRequest;
 	    getRequest = request.split(" ");
@@ -18,11 +18,11 @@ public class RequestManager {
 	    return null;
 	}
     }
-	
-    private String requestParams() {
-	String url = requestURL();
+
+    private String requestedParams() {
+	String url = requestedURL();
 	String[] params;
-	if(url != null && url.contains("?")) {
+	if (url != null && url.contains("?")) {
 	    params = url.split("\\?");
 	    return params[1];
 	} else {
@@ -30,11 +30,22 @@ public class RequestManager {
 	}
     }
 
-    public String requestFile(){
-	String url = requestURL();
+    private String requestedPosition() {
+	String[] position;
+	String params = requestedParams();
+	if(params != null) {
+	    position = params.split("\\.");
+	    return position[0];
+	} else {
+	    return null;
+	}
+    }
+
+    public String requestedFile(){
+	String url = requestedURL();	
 	String[] file;
-	if(url != null)
-	    if(url.contains("?")){
+	if(url != null) {
+	    if (url.contains("?")) {
 		file = url.split("\\?");
 		return "." + file[0];
 	    } else {
@@ -45,7 +56,7 @@ public class RequestManager {
 	}
     }
     
-    public String requestType() {
+    public String requestedType() {
 	if (request.contains("image/png")) {
 	    return "image/svg+xml";
 	} else if (request.contains("text/html")) {
@@ -57,15 +68,29 @@ public class RequestManager {
 	}
     }
 
-    public String requestPosition() {
-	String[] position;
-	String params = requestParams();
-	if(params != null) {
-	    position = params.split(".");
-	    return position[0];
-	} else {
-	    return null;
+    private void applyNextPositions(ChessBoard board) {
+	String position = requestedPosition();
+	if (position != null && !position.contains("to")) {
+	    int x = (int) (position.charAt(0) - 65);
+	    int y = Integer.parseInt("" + position.charAt(1));
+	    board.setNextPositionsFrom(x, y-1);
 	}
+    }
+
+    private void applyMove(ChessBoard board) {
+	String position = requestedPosition();
+	if (position != null && position.contains("to")) {
+	    int x = (int) (position.charAt(2) - 65);
+	    int y = Integer.parseInt("" + position.charAt(3));
+	    board.movePieceTo(x, y-1);
+	}
+    }
+
+    public void applyRequestedParams(ChessBoard board) throws IOException {
+	applyNextPositions(board);
+	applyMove(board);
+	HTMLBuilder builder = new HTMLBuilder(board);
+	builder.build("index.html");
     }
     
 }

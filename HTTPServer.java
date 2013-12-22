@@ -12,10 +12,7 @@ public class HTTPServer {
     private BufferedWriter out;
     private ResponseManager resm;
     private RequestManager reqm;
-/** 
-* représente le nombre de connexion
-*/
-//private static Integer LAST_ID;
+    ChessBoard board;
 
     public HTTPServer() throws Exception{
 	this(12345);
@@ -27,33 +24,35 @@ public class HTTPServer {
 
     public HTTPServer(int port) throws NumberFormatException, IOException, NoSuchElementException{
 	System.out.println("Starting server using port: "+ port);
-	serverSocket = new ServerSocket(port); // On injecte le port sur lequel le serveur va écouter
-	//LAST_ID=0;
+
+	serverSocket = new ServerSocket(port);
+
 	System.out.println("HTTP Server ready!");
+
+	board = new ChessBoard();
     }
+
     public void loadConnection() throws IOException{
 
 	start();
 	
-	//this.tc = new ThreadConnexion(this.connexion,LAST_ID++); 
-	//this.tc.start();//on lance le Thread de connexion
-
-	System.out.println("receiving data\n");
+	System.out.println("receiving data");
 	
 	String request = readRequest();
 	  
 	System.out.println(request);
 	  
-	System.out.println("sending data\n");
-
 	reqm = new RequestManager(request);	
 	
-	sendHEAD(reqm.requestType());
-	System.out.println("sending data\n");
+	resm = new ResponseManager(reqm.requestedFile());
 
-	resm = new ResponseManager(reqm.requestURL());
+	sendHEAD();
+	
+	System.out.println("sending data");
      
 	sendResponse();
+
+	System.out.println("data sent");
 	
 	close();
     }
@@ -77,15 +76,17 @@ public class HTTPServer {
 	return sb.toString();
     }
     
-    private void sendHEAD(String type) throws IOException{
-	if (type != null){
-	    out.write("HTTP/1.0 200 OK\r\n");
-	    out.write("Content-Type: " + type + "\r\n");
+    private void sendHEAD() throws IOException{
+	if (reqm.requestedType() != null){
+	    out.write("HTTP/1.1 200 OK\r\n");
+	    out.write("Content-Type: " + reqm.requestedType() + "\r\n");
+	    out.write("Last-Modified: " + resm.date() + "\r\n");
 	    out.write("\r\n");
 	}
     }
 
     private void sendResponse() throws IOException {
+	reqm.applyRequestedParams(board);
 	String line = resm.read();
 	if (line == null)
 	    out.write("file does not exist");
