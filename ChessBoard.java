@@ -1,14 +1,18 @@
+import java.util.*;
+
 public class ChessBoard {
 
     private Piece[][] pieces;
     private String[][] squares;
     private Boolean turn; //white if true
     private Position selected;
+    private List<Position> historique;
 
     public ChessBoard() {
 	squares = new String[8][8];
 	pieces = new Piece[8][8];
 	turn = true;
+	historique = new ArrayList<Position>();
 	initializeBoard();
 	initializePieces();
     }
@@ -128,6 +132,8 @@ public class ChessBoard {
 	pieces[x][y] = p;
 	pieces[selected.getX()][selected.getY()] = null;
 	turn = turn ? false : true;
+	historique.add(selected);
+	historique.add(pos);
     }
 
 }
